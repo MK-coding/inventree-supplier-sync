@@ -5,10 +5,10 @@ from django.urls import re_path
 import logging
 
 from plugin import InvenTreePlugin
-from plugin.mixins import ScheduleMixin, SettingsMixin, AppMixin, PanelMixin, UrlsMixin
+from plugin.mixins import ScheduleMixin, SettingsMixin, AppMixin, UserInterfaceMixin, UrlsMixin
 from part.models import Part
 from company.models import Company, SupplierPriceBreak, ManufacturerPart, SupplierPart
-from part.views import PartIndex
+from part.api import PartDetail
 
 from .version import PLUGIN_VERSION
 from .mouser import Mouser
@@ -25,7 +25,7 @@ logger.setLevel(logging.INFO)
 
 
 # ---------------------------- SupplierSyncPlugin -----------------------------
-class SupplierSyncPlugin(AppMixin, ScheduleMixin, SettingsMixin, PanelMixin, InvenTreePlugin, UrlsMixin):
+class SupplierSyncPlugin(AppMixin, ScheduleMixin, SettingsMixin, UserInterfaceMixin, InvenTreePlugin, UrlsMixin):
 
     NAME = "SupplierSyncPlugin"
     SLUG = "suppliersync"
@@ -109,7 +109,7 @@ class SupplierSyncPlugin(AppMixin, ScheduleMixin, SettingsMixin, PanelMixin, Inv
     def get_custom_panels(self, view, request):
         panels = []
         self.sync_objects = SupplierPartChange.objects.order_by('pk')
-        if isinstance(view, PartIndex):
+        if isinstance(view, PartDetail):
             panels.append({'title': 'Sync results',
                            'icon': 'fa-user',
                            'content_template': 'supplier_sync/sync.html'})
